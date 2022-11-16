@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="13d2b7d0-7b77-4d67-bd9d-ba3f3e0f1b3d" >
+		<http:listener-connection host="localhost" port="8083" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="eec057d3-7955-4910-a4e1-288fc74e19ea" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="005c5fd1-960f-4f04-818b-bff6170db67b" >
+		<http:request-connection host="localhost" port="8082" />
+	</http:request-config>
+	<flow name="process12Flow" doc:id="45e1611f-71c5-404c-a48f-88a490168640" >
+		<http:listener doc:name="Listener" doc:id="b3a36dff-f1c2-452a-9fd4-628598030688" config-ref="HTTP_Listener_config" path="/process13"/>
+		<logger level="INFO" doc:name="Logger" doc:id="405e3d73-bd14-48f7-a99e-2f0447e860e3" message="adding the tables"/>
+		<http:request method="GET" doc:name="Request" doc:id="cc3bdf74-071b-4380-9185-0f3e65b13c76" config-ref="HTTP_Request_configuration" path="/system1"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="d8e8018c-b785-4874-9739-df3be89786a1" variableName="payload1"/>
+		<http:request method="GET" doc:name="Request" doc:id="9525c6fd-ab03-46ea-a6af-9ccead32e848" config-ref="HTTP_Request_configuration1" path="/system2"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="92b8bc12-8692-4323-9f1a-b98b2869b251" variableName="payload2"/>
+		<ee:transform doc:name="Transform Message" doc:id="98fe4869-d013-4326-99e6-7dfc1e7ca380" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"finalResponse": vars.payload1 ++ vars.payload2
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
